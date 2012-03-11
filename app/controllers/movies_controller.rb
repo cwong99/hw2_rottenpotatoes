@@ -25,24 +25,46 @@ class MoviesController < ApplicationController
     end
     logger.debug(ratingArray.length)
    
-
+    redirectPath=false
+    redirectURL="/movies?"
     if params[:sortBy]==nil
       if flash[:sortedBy]!=nil
         params[:sortBy]=flash[:sortedBy]
+        logger.debug("will not redirect sortby")
       else 
         if session[:sortedBy]!=nil
-           params[:sortBy]=session[:sortedBy]
+           logger.debug("displaying session sortedBy")
+           logger.debug(session[:sortedBy])
+           flash[:sortedBy]=session[:sortedBy]
+           session.delete(:sortedBy)
+           logger.debug("redirect at sortedBy")
+           
+           redirectPath=true
         end
       end
     end
     if ratingArray.length==0
       if flash[:ratingArray]!=nil
         ratingArray = flash[:ratingArray]
+        logger.debug("shouldn't redirectory")
       else
-        if session[:ratingArray]!=nil
-          ratingArray = session[:ratingArray]
+        if session[:ratingArray]!=nil&&session[:ratingArray].length>0
+          flash[:ratingArray] = session[:ratingArray]
+          flash[:ratings] = session[:ratings]
+          logger.debug("redirect at ratings")
+          logger.debug(session[:ratingArray])
+          session.delete(:ratingArray)
+          session.delete(:ratings)
+          redirectPath=true
         end
       end
+    end
+    if redirectPath==true
+      logger.debug("at redirect path")
+      logger.debug(flash[:sortedBy])
+      logger.debug(flash[:ratings])
+     redirect_to movies_path({:sortBy=>flash[:sortedBy],:ratings=>flash[:ratings]})
+     #redirect_to movies_path({:sortedBy=>"title",:ratings=>{"G"=>"1", "PG"=>"1"}})
     end
     logger.debug("Before if statement")
     logger.debug(params[:sortedBy])
@@ -62,8 +84,10 @@ class MoviesController < ApplicationController
          end
     end
      flash[:ratingArray] = ratingArray
+     flash[:ratings]=params[:ratings]
      flash[:sortedBy] = params[:sortBy]
      session[:ratingArray] = ratingArray
+     session[:ratings]=params[:ratings]
      session[:sortedBy] = params[:sortBy]
 
   end
