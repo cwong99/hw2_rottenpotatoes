@@ -1,12 +1,26 @@
 -#  This file is app/views/movies/index.html.haml
 %h1 All Movies
 
+= form_tag movies_path, :method => :get do
+  Include: 
+  - @all_ratings.each do |rating|
+    = rating
+    = check_box_tag "ratings[#{rating}]" , 1,(flash[:ratingArray]!=nil)&&(flash[:ratingArray].include?rating)
+  = submit_tag 'Refresh'
+  
 %table#movies
   %thead
     %tr
-      %th Movie Title
-      %th Rating
-      %th Release Date
+      -if flash[:sortedBy]=="title"
+        %th{:class=>"hilite"}=link_to "Movie Title",movies_path(:sortBy=> "title"), {:id=>"title_header"} 
+      -else
+        %th=link_to "Movie Title",movies_path(:sortBy=> "title"), {:id=>"title_header"} 
+   
+      %th Rating 
+      -if flash[:sortedBy]=="release_date"
+        %th{:class=>"hilite"}=link_to "Release Date",movies_path(:sortBy=> "release_date"), {:id=>"release_date_header"}
+      -else
+        %th=link_to "Release Date",movies_path(:sortBy=> "release_date"), {:id=>"release_date_header"}
       %th More Info
   %tbody
     - @movies.each do |movie|
