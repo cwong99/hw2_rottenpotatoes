@@ -29,11 +29,19 @@ class MoviesController < ApplicationController
     if params[:sortBy]==nil
       if flash[:sortedBy]!=nil
         params[:sortBy]=flash[:sortedBy]
+      else 
+        if session[:sortedBy]!=nil
+           params[:sortBy]=session[:sortedBy]
+        end
       end
     end
     if ratingArray.length==0
       if flash[:ratingArray]!=nil
         ratingArray = flash[:ratingArray]
+      else
+        if session[:ratingArray]!=nil
+          ratingArray = session[:ratingArray]
+        end
       end
     end
     logger.debug("Before if statement")
@@ -55,6 +63,8 @@ class MoviesController < ApplicationController
     end
      flash[:ratingArray] = ratingArray
      flash[:sortedBy] = params[:sortBy]
+     session[:ratingArray] = ratingArray
+     session[:sortedBy] = params[:sortBy]
 
   end
   def new
